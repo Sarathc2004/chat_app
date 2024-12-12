@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "63343019302",
+    "project_id": "watsappchatscreen",
+    "storage_bucket": "watsappchatscreen.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63343019302:android:e450c44300c33718eeede7",
+        "android_client_info": {
+          "package_name": "com.example.watsappchatscreen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmUsSNfu1O9fv0i0rGHNwgKyd0OyuOYjQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
