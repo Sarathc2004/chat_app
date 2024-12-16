@@ -287,6 +287,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:watsappchatscreen/bloc/chatbloc/chat_bloc.dart';
 import 'package:watsappchatscreen/bloc/chatbloc/chat_event.dart';
 import 'package:watsappchatscreen/bloc/chatbloc/chat_state.dart';
@@ -380,13 +381,39 @@ class ChatScreen extends StatelessWidget {
                       icon: const Icon(Icons.image),
                       onPressed: () async {
                         final picker = ImagePicker();
-                        final image = await picker.pickImage(
-                          source: ImageSource.gallery,
-                        );
-                        if (image != null) {
-                          context
-                              .read<ChatBloc>()
-                              .add(SendImageEvent(image.path));
+                        final pickedFile =
+                            await picker.pickImage(source: ImageSource.camera);
+
+                        if (pickedFile != null) {
+                          try {
+                            // Define the Downloads directory path
+                            final downloadsDir = Directory(
+                                '/storage/emulated/0/Download/Images');
+
+                            // Create the "Images" folder in Downloads if it doesn't exist
+                            if (!downloadsDir.existsSync()) {
+                              downloadsDir.createSync(recursive: true);
+                            }
+
+                            // Generate a unique file name
+                            final fileName =
+                                'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+                            // Copy the image file to the Downloads/Images folder
+                            final savedFile = await File(pickedFile.path)
+                                .copy('${downloadsDir.path}/$fileName');
+
+                            // Show a success message with the path
+                            print("Saved image at ${savedFile.path}");
+
+                            // Optionally send the image in the chat
+                            context
+                                .read<ChatBloc>()
+                                .add(SendImageEvent(savedFile.path));
+                          } catch (e) {
+                            // Show an error message
+                            print('Failed to save image: $e');
+                          }
                         }
                       },
                       color: Colors.grey,
