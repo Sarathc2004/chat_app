@@ -9,10 +9,23 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF075E54),
-        title: const Text('WhatsApp'),
+        title: const Text(
+          'WhatsApp',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+          IconButton(
+              icon: const Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
+              onPressed: () {}),
+          IconButton(
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+              onPressed: () {}),
         ],
       ),
       body: ListView(

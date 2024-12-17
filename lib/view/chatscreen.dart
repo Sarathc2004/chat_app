@@ -287,7 +287,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:watsappchatscreen/bloc/chatbloc/chat_bloc.dart';
 import 'package:watsappchatscreen/bloc/chatbloc/chat_event.dart';
 import 'package:watsappchatscreen/bloc/chatbloc/chat_state.dart';
@@ -302,7 +301,30 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(name),
+        title: Text(
+          name,
+          style: const TextStyle(color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+              icon: const Icon(
+                Icons.videocam_outlined,
+                color: Colors.white,
+              ),
+              onPressed: () {}),
+          IconButton(
+              icon: const Icon(
+                Icons.phone,
+                color: Colors.white,
+              ),
+              onPressed: () {}),
+          IconButton(
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
+              onPressed: () {}),
+        ],
         backgroundColor: const Color(0xFF075E54),
       ),
       body: Column(
@@ -378,7 +400,43 @@ class ChatScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.image),
+                      icon: const Icon(Icons.camera_alt),
+//                       onPressed: () async {
+//   final picker = ImagePicker();
+//   final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+//   if (pickedFile != null) {
+//     try {
+//       // Let the user select a directory to save the image
+//       final String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+
+//       if (selectedDirectory == null) {
+//         print('No directory selected.');
+//         return; // Exit if no directory is chosen
+//       }
+
+//       // Create a folder for storing images if needed
+//       final imagesDir = Directory('$selectedDirectory/Images');
+//       if (!imagesDir.existsSync()) {
+//         imagesDir.createSync(recursive: true);
+//       }
+
+//       // Generate a unique file name
+//       final fileName = 'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+//       // Copy the file to the selected directory
+//       final savedFile = await File(pickedFile.path).copy('${imagesDir.path}/$fileName');
+
+//       // Notify the user
+//       print("Saved image at ${savedFile.path}");
+
+//       // Optionally send the image in the chat
+//       context.read<ChatBloc>().add(SendImageEvent(savedFile.path));
+//     } catch (e) {
+//       print('Failed to save image: $e');
+//     }
+//   }
+// },
                       onPressed: () async {
                         final picker = ImagePicker();
                         final pickedFile =
