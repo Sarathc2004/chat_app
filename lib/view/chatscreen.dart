@@ -282,11 +282,13 @@
 // }
 
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
 import 'package:watsappchatscreen/bloc/chatbloc/chat_bloc.dart';
 import 'package:watsappchatscreen/bloc/chatbloc/chat_event.dart';
 import 'package:watsappchatscreen/bloc/chatbloc/chat_state.dart';
@@ -400,43 +402,41 @@ class ChatScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.sentiment_satisfied_alt)),
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: const InputDecoration(
+                          hintText: "Type a message",
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        // Allow only PDF files to be selected
+                        final result = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['pdf'], // Restrict to PDFs
+                        );
+
+                        if (result != null &&
+                            result.files.single.path != null) {
+                          final pdfPath = result.files.single.path!;
+                          print("Selected PDF: $pdfPath");
+
+                          // Send the PDF file path to the chat
+                          context.read<ChatBloc>().add(SendImageEvent(pdfPath));
+                        } else {
+                          print("No file selected or file is not a PDF.");
+                        }
+                      },
+                      icon: const Icon(Icons.attach_file_rounded),
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.camera_alt),
-//                       onPressed: () async {
-//   final picker = ImagePicker();
-//   final pickedFile = await picker.pickImage(source: ImageSource.camera);
-
-//   if (pickedFile != null) {
-//     try {
-//       // Let the user select a directory to save the image
-//       final String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-
-//       if (selectedDirectory == null) {
-//         print('No directory selected.');
-//         return; // Exit if no directory is chosen
-//       }
-
-//       // Create a folder for storing images if needed
-//       final imagesDir = Directory('$selectedDirectory/Images');
-//       if (!imagesDir.existsSync()) {
-//         imagesDir.createSync(recursive: true);
-//       }
-
-//       // Generate a unique file name
-//       final fileName = 'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-//       // Copy the file to the selected directory
-//       final savedFile = await File(pickedFile.path).copy('${imagesDir.path}/$fileName');
-
-//       // Notify the user
-//       print("Saved image at ${savedFile.path}");
-
-//       // Optionally send the image in the chat
-//       context.read<ChatBloc>().add(SendImageEvent(savedFile.path));
-//     } catch (e) {
-//       print('Failed to save image: $e');
-//     }
-//   }
-// },
+//
                       onPressed: () async {
                         final picker = ImagePicker();
                         final pickedFile =
@@ -476,15 +476,6 @@ class ChatScreen extends StatelessWidget {
                       },
                       color: Colors.grey,
                     ),
-                    Expanded(
-                      child: TextField(
-                        controller: _messageController,
-                        decoration: const InputDecoration(
-                          hintText: "Type a message",
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
                     IconButton(
                       icon: const Icon(Icons.send),
                       onPressed: () {
@@ -515,6 +506,102 @@ class ChatScreen extends StatelessWidget {
   }
 }
 
+// class MessageBubble extends StatelessWidget {
+//   final String message;
+//   final String time;
+//   final bool isMe;
+//   final bool isImage;
+
+//   const MessageBubble({
+//     Key? key,
+//     required this.message,
+//     required this.time,
+//     required this.isMe,
+//     required this.isImage,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Align(
+//       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+//       child: Container(
+//         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+//         padding: const EdgeInsets.all(10),
+//         width: 250, // Fixed width for consistency
+//         decoration: BoxDecoration(
+//           color: isMe ? const Color(0xFFDCF8C6) : Colors.white,
+//           borderRadius: BorderRadius.only(
+//             topLeft: const Radius.circular(8),
+//             topRight: const Radius.circular(8),
+//             bottomLeft: isMe ? const Radius.circular(8) : Radius.zero,
+//             bottomRight: isMe ? Radius.zero : const Radius.circular(8),
+//           ),
+//           boxShadow: [
+//             BoxShadow(
+//               color: Colors.grey.withOpacity(0.2),
+//               spreadRadius: 1,
+//               blurRadius: 3,
+//             ),
+//           ],
+//         ),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             if (isImage && message.endsWith('.pdf')) ...[
+//               GestureDetector(
+//                 onTap: () {
+//                   // Open the PDF file
+//                   OpenFile.open(message);
+//                 },
+//                 child: Row(
+//                   children: [
+//                     const Icon(Icons.picture_as_pdf,
+//                         color: Colors.red, size: 40),
+//                     const SizedBox(width: 8),
+//                     Expanded(
+//                       child: Text(
+//                         message.split('/').last, // Show only the file name
+//                         style: const TextStyle(
+//                           fontSize: 16,
+//                           fontWeight: FontWeight.bold,
+//                           color: Colors.black,
+//                         ),
+//                         overflow: TextOverflow.ellipsis,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ] else if (isImage) ...[
+//               // If it's an image, display the image file
+//               Image.file(
+//                 File(message),
+//                 width: 200,
+//                 height: 200,
+//                 fit: BoxFit.cover,
+//               ),
+//             ] else ...[
+//               // Regular text message
+//               Text(
+//                 message,
+//                 style: const TextStyle(fontSize: 16),
+//               ),
+//             ],
+//             const SizedBox(height: 5),
+//             Align(
+//               alignment: Alignment.bottomRight,
+//               child: Text(
+//                 time,
+//                 style: const TextStyle(fontSize: 12, color: Colors.grey),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 class MessageBubble extends StatelessWidget {
   final String message;
   final String time;
@@ -535,7 +622,7 @@ class MessageBubble extends StatelessWidget {
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
           color: isMe ? const Color(0xFFDCF8C6) : Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -550,13 +637,64 @@ class MessageBubble extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // isImage
+            //     ? Image.file(
+            //         File(message),
+            //         width: 200,
+            //         height: 200,
+            //         fit: BoxFit.cover,
+            //       )
+            //     : Text(
+            //         message,
+            //         style: const TextStyle(fontSize: 16),
+            //       ),
             isImage
-                ? Image.file(
-                    File(message),
-                    width: 200,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  )
+                ? message.endsWith('.pdf') // Check if the message is a PDF
+                    ? GestureDetector(
+                        onTap: () {
+                          // Open the PDF file
+                          OpenFile.open(message);
+                        },
+                        child: Container(
+                          width: 200,
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.picture_as_pdf,
+                                  color: Colors.red, size: 50),
+                              const SizedBox(height: 10),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text(
+                                  message
+                                      .split('/')
+                                      .last, // Show only the file name
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : Image.file(
+                        File(message),
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      )
                 : Text(
                     message,
                     style: const TextStyle(fontSize: 16),
